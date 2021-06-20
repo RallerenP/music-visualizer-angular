@@ -1,0 +1,33 @@
+<div style="margin-left: {{nest*8}}px;">
+  <div *ngIf="prop.type === 'container'">
+  <span [title]="prop.description" (click)="open = !open" class="cursor-pointer">
+    <fa-icon [icon]="open ? faCaretDown : faCaretRight"></fa-icon> {{ prop.name }}
+  </span>
+    <div *ngIf="open">
+      <app-property-editor  *ngFor="let _prop of asArray(prop.value)"  [nest]="nest+1" [prop]="_prop"></app-property-editor>
+    </div>
+  </div>
+
+  <div *ngIf="prop.type === 'number'">
+    <span [title]="prop.description">{{ prop.name }}:</span>
+    <br>
+
+    <input class="w-full" [formControl]="input" (mouseenter)="hover($event)" [step]="prop.inc || 1" type="number" [value]="prop.value" (change)="
+    set()">
+  </div>
+  <div *ngIf="prop.type === 'color'">
+    <span [title]="prop.description">{{ prop.name }}:</span>
+    <br>
+    <div class="flex w-full items-center">
+      <div style="background: {{prop.value}}" class="h-[16px] w-[16px] border border-black flex-shrink-0 mr-2"></div>
+      <input class="w-full" [formControl]="input" (mouseenter)="hover($event)" [step]="prop.inc || 1" type="text" [value]="prop.value" (change)="set()">
+    </div>
+
+  </div>
+  <div *ngIf="prop.type === 'checkmark'">
+    <span [title]="prop.description">{{ prop.name }}:</span><input [formControl]="input" (mouseenter)="hover($event)" [step]="prop.inc || 1" type="checkbox" [value]="prop.value" (change)="set()">
+  </div>
+
+</div>
+
+

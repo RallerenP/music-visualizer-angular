@@ -1,0 +1,28 @@
+<div *ngIf="selected === null; else edit" class="p-4 max-h-[calc(100vh-100px-2rem)]">
+  <div
+    *ngFor="let dancer of stageService.dancers"
+    class="h-8 pl-4 hover:bg-orange-yellow-crayola-brighter flex items-center cursor-pointer"
+    (click)="select(dancer)"
+    (mouseenter)="dancer.highlight()"
+    (mouseleave)="dancer.unhighlight()"
+  >
+    {{ dancer.constructor.name }}
+  </div>
+</div>
+<ng-template #edit>
+  <div class="p-4">
+    <div (click)="unselect()" class="text-persian-green-primary cursor-pointer">
+      <fa-icon [icon]="faCaretLeft"></fa-icon> Back
+    </div>
+    <div class="border border-gray-900 w-full my-4"></div>
+    <div *ngFor="let prop of props">
+      <app-property-editor [nest]="0" [prop]="prop">
+
+      </app-property-editor>
+    </div>
+  </div>
+</ng-template>
+<hr>
+
+
+

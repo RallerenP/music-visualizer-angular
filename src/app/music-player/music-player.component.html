@@ -1,0 +1,19 @@
+<div class="flex flex-col bg-charcoal-primary">
+  <div class="flex-grow h-[36px] flex mx-auto justify-center items-center">
+    <button (click)="this.musicService.prev()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <fa-icon class="text-persian-green-primary" [icon]="faStepBackward"></fa-icon>
+    </button>
+    <button (click)="this.musicService.toggle()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <fa-icon class="text-persian-green-primary" [icon]="this.musicService.isPlaying ? faPause : faPlay"></fa-icon>
+    </button>
+    <button (click)="this.musicService.next()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <fa-icon class="text-persian-green-primary" [icon]="faStepForward"></fa-icon>
+    </button>
+    <button (click)="this.musicService.mute()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <fa-icon class="text-persian-green-primary" [icon]="faVolumeUp"></fa-icon>
+    </button>
+    <input [formControl]="volumeSlider" (input)="volume()" type="range">
+  </div>
+  <canvas #canvasHolder class="h-[64px]">
+  </canvas>
+</div>

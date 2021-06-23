@@ -4,6 +4,10 @@ import {AnalyserService} from "../music/analyser.service";
 import {Dancer} from "../dancer/dancer.interface";
 import {BehaviorSubject} from "rxjs";
 import {BackgroundDancer} from "../dancer/dancers/BackgroundDancer";
+import { TriangleDancer } from "../dancer/dancers/TriangleDancer";
+import * as  FileSave  from 'file-saver';
+import * as FileSaver from "file-saver";
+import * as _ from "lodash";
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +20,7 @@ export class StageService {
     ]
 
   public selected: BehaviorSubject<Dancer | null> = new BehaviorSubject<Dancer | null>(null);
+  private _selected: Dancer | null = null;
 
   constructor(private analyserService: AnalyserService) {
     const bg = new BackgroundDancer(analyserService);
@@ -37,6 +42,8 @@ export class StageService {
       sel?.highlight();
 
       prev = sel;
+
+      this._selected = sel;
     })
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -60,9 +67,61 @@ export class StageService {
     this._dancers.push(dancer)
   }
 
+  public Triangle(x: number, y: number) {
+    const dancer = new TriangleDancer(this.analyserService, x, y);
+    dancer.onclick = () => this.selected.next(dancer);
+    this._dancers.push(dancer);
+  }
+
   public get dancers() {
     return this._dancers;
   }
 
+  saveDancers() {
+    const _JSON: any[] = []
+    this._dancers.forEach((dancer: Dancer) => {
+      _JSON.push(dancer.toJSON())
+    });
+
+    const file = new File([JSON.stringify(_JSON)], 'dancers.json', { type: "text/plain" })
+    FileSaver.saveAs(file)
+  }
+
+  loadDancers(json: any) {
+    const dict = new Map<string, any>(
+      [
+        ['CircleDancer', CircleDancer],
+        ['BackgroundDancer', BackgroundDancer],
+        ['TriangleDancer', TriangleDancer]
+      ]
+    );
+
+    this._dancers = [];
+
+    json.forEach((_dancer: any) => {
+      const dancer = new (dict.get(_dancer.type))(this.analyserService);
+      dancer.fromJSON(_dancer.props);
+      this._dancers.push(dancer);
+    })
+
+  }
+
+  copy(d: Dancer) {
+    const dict = new Map<string, any>(
+      [
+        ['CircleDancer', CircleDancer],
+        ['BackgroundDancer', BackgroundDancer],
+        ['TriangleDancer', TriangleDancer]
+      ]
+    );
+
+    let dJson: any = JSON.stringify(d.toJSON());
+    dJson = JSON.parse(dJson);
+
+    const dancer = new (dict.get(dJson.type))(this.analyserService);
+    dancer.fromJSON(dJson.props);
+    this._dancers.push(dancer);
+
+  }
 
 }

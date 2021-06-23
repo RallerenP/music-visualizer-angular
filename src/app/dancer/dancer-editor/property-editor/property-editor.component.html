@@ -27,6 +27,9 @@
   <div *ngIf="prop.type === 'checkmark'">
     <span [title]="prop.description">{{ prop.name }}:</span><input [formControl]="input" (mouseenter)="hover($event)" [step]="prop.inc || 1" type="checkbox" [value]="prop.value" (change)="set()">
   </div>
+  <div *ngIf="prop.type === 'string'">
+    <span [title]="prop.description">{{ prop.name }}:</span><input class="w-full" [formControl]="input" (mouseenter)="hover($event)"  type="text" [value]="prop.value" (change)="set()">
+  </div>
 
 </div>
 

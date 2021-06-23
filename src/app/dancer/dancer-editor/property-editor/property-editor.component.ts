@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MutableDancerProp} from "../../dancer.interface";
 import {Observable} from "rxjs";
-import { faCaretRight, faCaretDown, faSquare, faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import {FormControl} from "@angular/forms";
 
 @Component({
@@ -17,8 +17,6 @@ export class PropertyEditorComponent implements OnInit {
 
   faCaretRight = faCaretRight;
   faCaretDown = faCaretDown;
-  faSquare = faSquare;
-  faCheckSquare = faCheckSquare
 
   open: boolean = false;
 

@@ -5,10 +5,12 @@ import { CircleDancerProps } from "./CircleDancer";
 
 export type ShapeDancerProps = {
   native: {
+    name: string
     position: {x: number, y: number}
     color: string;
     height: number;
     width: number;
+    rotation: number;
     border: {
       enabled: boolean
       color: string;
@@ -63,6 +65,9 @@ export type ShapeDancerProps = {
   temp: {
     position: {x: number, y: number}
     color: string;
+    height: number,
+    width: number,
+    rotation: number;
     border: {
       enabled: boolean
       color: string;
@@ -84,7 +89,7 @@ export abstract class ShapeDancer<T> implements Dancer {
 
   private readonly clickListener: (e: MouseEvent) => void;
 
-  protected constructor(private analyserService: AnalyserService, x: number, y: number) {
+  protected constructor(private analyserService: AnalyserService) {
     this.clickListener = (e: MouseEvent) => {
       const rect = (e.target as HTMLElement).getBoundingClientRect();
 
@@ -136,4 +141,15 @@ export abstract class ShapeDancer<T> implements Dancer {
   }
 
   public abstract generateMutableProps(): MutableDancerProp[]
+
+  toJSON(): Object {
+    return {
+      type: this.constructor.name,
+      props: this.props
+    };
+  }
+
+  fromJSON(props: any) {
+    this.props = props;
+  }
 }

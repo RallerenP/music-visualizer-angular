@@ -1,10 +1,19 @@
 import {Dancer, MutableDancerProp} from "../dancer.interface";
 import {AnalyserService} from "../../music/analyser.service";
 import { lerp, scale } from "src/util";
+import { Particle } from "./BackgroundDancer/Particle";
 
 export interface BackgroundDancerProps {
   native: {
     color: string;
+    particles: {
+      enabled: boolean
+      amount: number,
+      speed_mult: number,
+      rms_boost: number
+      friction: number,
+      lifetime: number
+    }
   },
   move_params: {
     COLOR_BLEND: {
@@ -90,13 +99,23 @@ export const BackgroundDancerMoves = {
 }
 
 export class BackgroundDancer implements Dancer {
+  particles: Particle[] = []
+
   constructor(private analyserService: AnalyserService) {
 
   }
 
   private props: BackgroundDancerProps = {
     native: {
-      color: '#000000'
+      color: '#000000',
+      particles: {
+        enabled: true,
+        rms_boost: 5,
+        amount: 100,
+        speed_mult: 0.5,
+        friction: 0.002,
+        lifetime: 1000
+      }
     },
     move_params: {
       COLOR_BLEND: {
@@ -134,11 +153,42 @@ export class BackgroundDancer implements Dancer {
     const width = ctx.canvas.clientWidth;
 
     const { color } = this.props.temp;
-
-    //console.log(color)
+    const { particles } = this.props.native;
 
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, width, height);
+
+
+
+    if (particles.enabled) {
+      const { amount, lifetime, friction, speed_mult, rms_boost } = particles;
+      const rms = this.analyserService.rms();
+
+      for (let i = 0; i < (this.analyserService.rms()) * amount; i++) {
+        this.particles.push(
+          new Particle(
+            Math.random() * ctx.canvas.width,
+            ctx.canvas.height,
+            (rms * rms_boost) * (Math.random() * speed_mult),
+            Math.random() * friction,
+            Math.random() * lifetime,
+            ctx)
+        )
+    }
+    }
+
+    this.particles = this.particles.filter(particle => {
+      particle.update();
+
+      if (!particle.dead) {
+        particle.draw();
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+
   }
 
   generateMutableProps(): MutableDancerProp[] {
@@ -211,6 +261,57 @@ export class BackgroundDancer implements Dancer {
                 set: (value: number) => this.props.move_params.COLOR_BLEND.SMOOTHING = value
               }
             ]
+          },
+          {
+            type: 'container',
+            name: 'Particles',
+            description: 'Particle system for this dancer',
+            value:  [
+              {
+                type: 'checkmark',
+                name: 'Enabled',
+                description: 'Enables or disables particles',
+                value: this.props.native.particles.enabled,
+                set: (value: boolean) => this.props.native.particles.enabled = value
+              },
+              {
+                type: 'number',
+                name: 'Amount',
+                description: 'Max amount of particles generated per frame',
+                value: this.props.native.particles.amount,
+                set: (value: number) => this.props.native.particles.amount = value
+              },
+              {
+                type: 'number',
+                name: 'Speed mult',
+                description: 'Max speed multiplier for particles',
+                value: this.props.native.particles.speed_mult,
+                inc: 0.1,
+                set: (value: number) => this.props.native.particles.speed_mult = value
+              },
+              {
+                type: 'number',
+                name: 'RMS Boost',
+                description: 'Boosts particle speed by RMS, multiplied by this amount',
+                value: this.props.native.particles.rms_boost,
+                set: (value: number) => this.props.native.particles.rms_boost = value
+              },
+              {
+                type: 'number',
+                name: 'Friction',
+                description: 'How quickly a particle loses speed',
+                value: this.props.native.particles.friction,
+                inc: 0.001,
+                set: (value: number) => this.props.native.particles.friction = value
+              },
+              {
+                type: 'number',
+                name: 'Life time',
+                description: 'Maximum life time (in frames) of particle',
+                value: this.props.native.particles.lifetime,
+                set: (value: number) => this.props.native.particles.lifetime = value
+              },
+            ]
           }
         ]
       }
@@ -228,6 +329,17 @@ export class BackgroundDancer implements Dancer {
   }
 
   unhighlight(): void {
+  }
+
+  toJSON(): Object {
+    return {
+      type: this.constructor.name,
+      props: this.props
+    };
+  }
+
+  fromJSON(props: any) {
+    this.props = props;
   }
 
 }

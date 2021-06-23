@@ -52,14 +52,20 @@ export class MusicService {
   }
 
   prev() {
-    //this._index = Math.abs((this._index - 1) % this.playlist.length);
-    //this._playing?.stop();
+    this._index--;
+    if (this._index < 0) {
+      this._index = MusicList.length - 1;
+    }
+
+    this._sound?.stop();
+    this._autoplay(this._index, MusicList);
   }
 
   next() {
-    // this._playing?.stop();
-    // this._index = (this._index + 1) % this.playlist.length;
-    // this.playing.next(new Music(this.playlist[this._index]));
+    this._index = (this._index + 1) % MusicList.length;
+
+    this._sound?.stop();
+    this._autoplay(this._index, MusicList);
   }
 
   mute() {
@@ -77,6 +83,7 @@ export class MusicService {
   }
 
   private _autoplay(i: number, list: MusicObject[]) {
+    this._index = i;
     this._sound = new Howl({
       src: [list[i].url],
       preload: true,

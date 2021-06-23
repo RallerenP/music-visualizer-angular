@@ -12,6 +12,9 @@ export interface Dancer {
   unhighlight(): void;
   destroy(): void;
   onclick(): void;
+
+  toJSON(): Object;
+  fromJSON(props: any): void
 }
 
 export interface MutableDancerProp {

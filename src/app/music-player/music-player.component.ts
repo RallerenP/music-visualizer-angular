@@ -2,11 +2,13 @@ import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/
 import * as p5 from 'p5';
 import {MusicService} from "../music/music.service";
 import {AnalyserService} from "../music/analyser.service";
-import { faPlay, faPause, faStepForward, faStepBackward, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faStepForward, faStepBackward, faVolumeMute, faVolumeUp, faFileDownload, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import {Dancer} from "../dancer/dancer.interface";
 import {loop, scale} from "../../util";
 import {FormControl} from "@angular/forms";
 import {StorageService} from "../storage.service";
+import { StageService } from "../stage/stage.service";
+import { FileChangeEvent } from "@angular/compiler-cli/src/perform_watch";
 
 @Component({
   selector: 'app-music-player',
@@ -21,15 +23,16 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
   faStepBackward = faStepBackward;
   faVolumeMute = faVolumeMute;
   faVolumeUp = faVolumeUp;
+  faFileDownload = faFileDownload
+  faFileUpload = faFileUpload
 
   @ViewChild('canvasHolder') canvasHolderRef!: ElementRef<HTMLCanvasElement>;
   volumeSlider = new FormControl();
 
-
   ctx!: CanvasRenderingContext2D;
   spectrum: number[] = this.analyzerService.spectrum();
 
-  constructor(public musicService: MusicService, private analyzerService: AnalyserService, private storageService: StorageService) { }
+  constructor(public musicService: MusicService, private analyzerService: AnalyserService, private storageService: StorageService, public stageService: StageService) { }
 
   ngOnInit() {
     const vol = this.storageService.getOnce<number>('volume');
@@ -60,8 +63,6 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
     this.ctx.clearRect(0, 0, width, height);
 
     this.ctx.fillStyle = "#2A9D8F"
-    //console.log("test")
-    //console.log(width, height)
 
     for (let i = 0; i < this.spectrum.length / 4; i++) {
       const mappedHeight = Math.max(scale(this.spectrum[i], 0, 255, 0, height), 2);
@@ -80,5 +81,22 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
         this.ctx.fillText(i.toString(), x, height - 5)
       }
     }
+  }
+
+  beginFileUpload() {
+    (document.querySelector('#dancerFileInput')! as HTMLInputElement).click();
+  }
+
+  handleUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+
+    const reader = new FileReader();
+    const file = target.files![0];
+
+    reader.addEventListener('load', (event: ProgressEvent<FileReader>) => {
+      this.stageService.loadDancers(JSON.parse(event.target!.result as string));
+    })
+
+    reader.readAsText(file);
   }
 }

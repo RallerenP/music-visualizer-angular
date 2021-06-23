@@ -13,6 +13,14 @@
       <fa-icon class="text-persian-green-primary" [icon]="faVolumeUp"></fa-icon>
     </button>
     <input [formControl]="volumeSlider" (input)="volume()" type="range">
+    <div class="w-[100px]"></div>
+    <button (click)="this.stageService.saveDancers()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <fa-icon class="text-persian-green-primary" [icon]="faFileDownload"></fa-icon>
+    </button>
+    <button (click)="input.click()" class="hover:bg-charcoal-brighter h-[28px] w-[28px] flex justify-center items-center rounded">
+      <input #input class="hidden" (change)="handleUpload($event)" type="file">
+      <fa-icon class="text-persian-green-primary" [icon]="faFileDownload"></fa-icon>
+    </button>
   </div>
   <canvas #canvasHolder class="h-[64px]">
   </canvas>

@@ -6,7 +6,8 @@
     (mouseenter)="dancer.highlight()"
     (mouseleave)="dancer.unhighlight()"
   >
-    {{ dancer.constructor.name }}
+    {{ dancer.generateMutableProps()[0].value }}
+    <button (click)="this.stageService.copy(dancer)">Copy</button>
   </div>
 </div>
 <ng-template #edit>
